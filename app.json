@@ -13,17 +13,28 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lytvynenko.collegeSchedule",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.yevhen_lytvynenko.schedule"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "owner": "yevhen_lytvynenko",
+    "extra": {
+      "eas": {
+        "projectId": "1a387e1b-637d-4f5e-9a88-6122bcfb55d6"
+      }
     }
   }
 }
