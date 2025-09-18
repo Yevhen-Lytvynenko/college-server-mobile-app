@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: width * 0.04, 
     backgroundColor: COLORS.BACKGROUND_COLOR,
-    marginTop: width * 0.1,
+    marginTop: width * 0.05,
     flexDirection: "column",
     gap: width * 0.03, 
   },
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: "absolute",
-    top: width * 0.15, 
+    top: width * 0.15, // Подставьте свое значение для оптимального отступа
     left: width * 0.04,
     right: width * 0.04,
     backgroundColor: COLORS.PRIMARY_COLOR,
