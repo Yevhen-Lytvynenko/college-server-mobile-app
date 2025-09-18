@@ -15,19 +15,19 @@ import ButtonDay from "./components/ButtonDay";
 
 type Schedule = string[][];
 type GroupsMap = Record<string, number>;
-type DayKey = "Пн" | "Вт" | "Ср" | "Чт" | "Пт" | "Сб";
+const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"] as const;
 
 export default function App() {
   const [schedule, setSchedule] = useState<Schedule>([]);
   const [cours, setSelectedCours] = useState<string>("K25.1");
-  const [day, setSelectedDay] = useState<DayKey | "">("Пн");
+  const [day, setSelectedDay] = useState<string | "">(days[new Date().getDay()-1]);
   const [items, setItems] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
       const data = await fetchSchedule(
-        "https://stud.server.odessa.ua/holovna/rozklad-zaniat/"
+        `https://stud.server.odessa.ua/wp-content/uploads/${new Date().getFullYear()}/${new Date().getMonth()+1<10?"0":""}${new Date().getMonth()+1}/`
       );
       setSchedule(data);
     })();
@@ -52,7 +52,7 @@ useEffect(() => {
   });
 }, [groups]);
 
-  const day_i: Record<DayKey, number> = {
+  const day_i: Record<string, number> = {
     "Пн": 4,
     "Вт": 19,
     "Ср": 34,
@@ -76,7 +76,7 @@ useEffect(() => {
   let lesson_i = 1;
 
   const cours_j = cours ? groups[cours] : undefined;
-  const index = day ? day_i[day as DayKey] : undefined;
+  const index = day ? day_i[day as string] : undefined;
 
     if (cours_j !== undefined && index !== undefined) {
       for (let i = index; i < index + 15 && i < schedule.length; i += 2) {
@@ -130,13 +130,9 @@ useEffect(() => {
           </Modal>
         </View>
 
-        <View style={styles.dayBtnWarpper}>
-          <ButtonDay title="Пн" setValue={() => setSelectedDay("Пн")} />
-          <ButtonDay title="Вт" setValue={() => setSelectedDay("Вт")} />
-          <ButtonDay title="Ср" setValue={() => setSelectedDay("Ср")} />
-          <ButtonDay title="Чт" setValue={() => setSelectedDay("Чт")} />
-          <ButtonDay title="Пт" setValue={() => setSelectedDay("Пт")} />
-          <ButtonDay title="Сб" setValue={() => setSelectedDay("Сб")} />
+        <View style={styles.dayBtnWarpper}>{
+          days.map((curDay) => <ButtonDay key={curDay} title={curDay} isActive={day===curDay} setValue={setSelectedDay}/>)
+        }
         </View>
       </View>
 
@@ -154,7 +150,7 @@ useEffect(() => {
                         : lesson[0].includes("Консультація")? COLORS.RED
                         : lesson[0]
                         ? COLORS.GREEN
-                        : COLORS.PRIMARY_COLOR,
+                        : COLORS.BORDER_COLOR,
                   }}
                 >
                   ●
@@ -180,7 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: width * 0.04, 
     backgroundColor: COLORS.BACKGROUND_COLOR,
-    marginTop: width * 0.05,
+    marginTop: width * 0.1,
     flexDirection: "column",
     gap: width * 0.03, 
   },
@@ -209,7 +205,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: "absolute",
-    top: width * 0.15, // Подставьте свое значение для оптимального отступа
+    top: width * 0.15, 
     left: width * 0.04,
     right: width * 0.04,
     backgroundColor: COLORS.PRIMARY_COLOR,

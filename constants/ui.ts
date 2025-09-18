@@ -4,5 +4,6 @@ export const COLORS = {
     BACKGROUND_COLOR: '#EDEEF0',
     BORDER_COLOR: "#ccc",
     GREEN: '#00ac2eff',
-    RED: '#e20000ff'
+    RED: '#e20000ff',
+    DARK_BLUE: '#0047b2ff'
 }

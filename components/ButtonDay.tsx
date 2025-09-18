@@ -4,21 +4,23 @@ import { COLORS } from "../constants/ui";
 
 interface ButtonDayProps {
   title: string;
+  isActive: boolean;
   setValue: (value: string) => void;
 }
 
-const ButtonDay: React.FC<ButtonDayProps> = ({ title, setValue }) => {
+const ButtonDay: React.FC<ButtonDayProps> = ({ title, setValue, isActive }) => {
+
   return (
     <TouchableOpacity
-      style={styles.customButton}
-      onPress={() => setValue(title)}
+      style={isActive? styles.customButtonPressed : styles.customButton}
+      onPress={() => setValue(title) }
     >
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
+let styles = StyleSheet.create({
   customButton: {
     backgroundColor: COLORS.SECONDARY_COLOR,
     borderRadius: 50,
@@ -26,6 +28,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 40,
     height: 40
+  },
+  customButtonPressed:{
+    backgroundColor: COLORS.DARK_BLUE,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 40,
+    height: 40,
+
   },
   buttonText: {
     color: COLORS.PRIMARY_COLOR,
