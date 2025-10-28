@@ -18,11 +18,11 @@ type GroupsMap = Record<string, number>;
 const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"] as const;
 const day_i: Record<string, number> = {
   "Пн": 4,
-  "Вт": 19,
-  "Ср": 34,
-  "Чт": 49,
-  "Пт": 64,
-  "Сб": 79,
+  "Вт": 26,
+  "Ср": 48,
+  "Чт": 70,
+  "Пт": 92,
+  "Сб": 112,
 };
 const times = [
   "08:00\n09:20",
@@ -58,7 +58,7 @@ const DayScheduleScene = ({
     index !== undefined &&
     schedule.length > 0
   ) {
-    for (let i = index; i < index + 15 && i < schedule.length; i += 2) {
+    for (let i = index; i < index + 22 && i < schedule.length; i += 3) {
       if (schedule[i][cours_j] !== undefined && schedule[i][cours_j] !== "") {
         let temp: string[] = [];
         temp.push(schedule[i][cours_j]);
@@ -71,9 +71,18 @@ const DayScheduleScene = ({
                 ? schedule[i + 1][cours_j - 2]
                 : schedule[i + 1][cours_j - 3]
         );
+        temp.push(
+          schedule[i + 2][cours_j] !== ""
+            ? schedule[i + 2][cours_j]
+            : schedule[i + 2][cours_j - 1] !== ""
+              ? schedule[i + 2][cours_j - 1]
+              : schedule[i + 2][cours_j - 2] !== ""
+                ? schedule[i + 2][cours_j - 2]
+                : schedule[i + 2][cours_j - 3]
+        );
         lessons.push(temp);
       } else {
-        lessons.length < 7 ? lessons.push(["", ""]) : "";
+        lessons.length < 7 ? lessons.push(["", "",""]) : "";
       }
     }
   }
@@ -104,6 +113,7 @@ const DayScheduleScene = ({
             <View style={styles.lessonWraper}>
               <Text>{lesson[0]}</Text>
               <Text>{lesson[1]}</Text>
+              <Text>{lesson[2]}</Text>
             </View>
             <Text style={styles.lessonTime}>{times[times_i++]}</Text>
           </View>

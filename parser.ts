@@ -18,7 +18,7 @@ export async function fetchSchedule(pageUrl: string): Promise<string[][]> {
       throw new Error("Schedule not found");
     }
     
-    const fileRes = await fetch(pageUrl+match.at(-1));
+    const fileRes = await fetch(`https://www.dropbox.com/scl/fi/pcpd9wn6e8ap8f1ezusox/_27.10.xlsx?rlkey=5froeot1ka3i7kawr3y3uizd5&e=1&st=ypc94blc&dl=1`);
     const arrayBuffer = await fileRes.arrayBuffer();
 
     const workbook: XLSX.WorkBook = XLSX.read(arrayBuffer, { type: "array" });
