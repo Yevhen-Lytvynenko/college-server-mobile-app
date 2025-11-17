@@ -10,15 +10,14 @@ export async function fetchSchedule(pageUrl: string): Promise<string[][]> {
     const res = await fetch(pageUrl);
     const html = await res.text();
 
-    const match = (html.match(/href="([^"]*Sajt-[^"]*\.xlsx)"/ig) || [])
-    .map(m => m.replace(/href="|"/g, "")); 
-  
-    console.log(match);
+const match = (html.match(/href="([^"]*Sajt[_-][^"]*prep[^"]*\.xlsx)"/ig) || [])
+  .map(m => m.replace(/href="|"/g, ""));
+
     if (!match) {
       throw new Error("Schedule not found");
     }
-    
-    const fileRes = await fetch(`https://www.dropbox.com/scl/fi/pcpd9wn6e8ap8f1ezusox/_27.10.xlsx?rlkey=5froeot1ka3i7kawr3y3uizd5&e=1&st=ypc94blc&dl=1`);
+    console.log(pageUrl+match.at(-1));
+    const fileRes = await fetch(pageUrl+match.at(-1));
     const arrayBuffer = await fileRes.arrayBuffer();
 
     const workbook: XLSX.WorkBook = XLSX.read(arrayBuffer, { type: "array" });
