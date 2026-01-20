@@ -6,6 +6,7 @@ import * as XLSX from "xlsx";
  * @returns Promise<string[][]> - массив строк из Excel
  */
 export async function fetchSchedule(pageUrl: string): Promise<string[][]> {
+  console.log("Fetching schedule from:", pageUrl);
   try {
     const res = await fetch(pageUrl);
     const html = await res.text();

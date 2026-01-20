@@ -1,8 +1,10 @@
-import React from "react";
-import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Dimensions } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Dimensions, Image } from "react-native";
 import { COLORS } from "../constants/ui";
 
 const { width } = Dimensions.get("window");
+
+type ModeType = "students" | "teachers";
 
 interface GroupPickerProps {
   open: boolean;
@@ -11,6 +13,8 @@ interface GroupPickerProps {
   onSelect: (item: string) => void;
   onClose: () => void;
   onToggle: () => void;
+  mode: ModeType;
+  onModeChange: (mode: ModeType) => void;
 }
 
 export const GroupPicker: React.FC<GroupPickerProps> = ({
@@ -20,12 +24,34 @@ export const GroupPicker: React.FC<GroupPickerProps> = ({
   onSelect,
   onClose,
   onToggle,
+  mode,
+  onModeChange,
 }) => {
+  const toggleMode = () => {
+    onModeChange(mode === "students" ? "teachers" : "students");
+  };
+
+  const getIcon = () => {
+    return mode === "students"
+      ? require("../assets/graduated.png")
+      : require("../assets/teacher.png");
+  };
   return (
     <View style={styles.pickerWrapper}>
-      <TouchableOpacity style={styles.dropdownButton} onPress={onToggle}>
-        <Text style={{ color: COLORS.PRIMARY_COLOR }}>{selected || "Оберіть групу"}</Text>
-      </TouchableOpacity>
+      <View style={styles.rowContainer}>
+        <View style={styles.dropdownButtonWrapper}>
+          <TouchableOpacity style={styles.dropdownButton} onPress={onToggle}>
+            <Text style={{ color: COLORS.PRIMARY_COLOR }}>{selected || "Оберіть групу"}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={styles.roundToggleButton}
+          onPress={toggleMode}
+        >
+          <Image source={getIcon()} style={styles.roundIcon} />
+        </TouchableOpacity>
+      </View>
 
       <Modal transparent visible={open} animationType="fade">
         <TouchableOpacity style={styles.overlay} onPress={onClose} />
@@ -47,18 +73,41 @@ export const GroupPicker: React.FC<GroupPickerProps> = ({
           />
         </View>
       </Modal>
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   pickerWrapper: { zIndex: 1000 },
+  rowContainer: {
+    flexDirection: "row",
+    gap: width * 0.03,
+    alignItems: "center",
+  },
+  dropdownButtonWrapper: {
+    flex: 1,
+  },
   dropdownButton: {
     borderWidth: 1,
     borderColor: COLORS.BORDER_COLOR,
     borderRadius: 12,
     padding: width * 0.03,
     backgroundColor: COLORS.SECONDARY_COLOR,
+  },
+  roundToggleButton: {
+    width: width * 0.13,
+    height: width * 0.13,
+    borderRadius: width * 0.03,
+    backgroundColor: COLORS.SECONDARY_COLOR,
+    borderWidth: 1,
+    borderColor: COLORS.BORDER_COLOR,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  roundIcon: {
+    width: width * 0.08,
+    height: width * 0.08,
   },
   overlay: { flex: 1 },
   dropdown: {

@@ -1,7 +1,8 @@
-import React from "react";
-import { ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
+import React, { useMemo } from "react";
+import { ScrollView, Text, StyleSheet, Dimensions } from "react-native";
 import { COLORS } from "../constants/ui";
 import { times, day_i } from "../constants/data";
+import { LessonItem } from "../components/LessonItem";
 
 type Schedule = string[][];
 type GroupsMap = Record<string, number>;
@@ -11,6 +12,7 @@ interface DayScheduleSceneProps {
   schedule: Schedule;
   groups: GroupsMap;
   selectedCours: string;
+  mode?: "students" | "teachers";
 }
 
 export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
@@ -18,59 +20,85 @@ export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
   schedule,
   groups,
   selectedCours,
+  mode = "students",
 }) => {
-  const cours_j = selectedCours ? groups[selectedCours] : undefined;
-  const index = day_i[dayKey as string];
-  let lessons: string[][] = [];
-  let lesson_i = 1;
-  let times_i = 0;
+  const index = day_i[dayKey];
 
-  if (cours_j !== undefined && index !== undefined && schedule.length > 0) {
-    for (let i = index; i < index + 22 && i < schedule.length; i += 3) {
-      if (schedule[i][cours_j] !== undefined && schedule[i][cours_j] !== "") {
-        const temp = [
-          schedule[i][cours_j],
-          schedule[i + 1][cours_j] || "",
-          schedule[i + 2][cours_j] || "",
-        ];
-        lessons.push(temp);
-      } else {
-        lessons.length < 7 && lessons.push(["", "", ""]);
+  const lessons = useMemo(() => {
+    let result: string[][] = [];
+
+    if (index === undefined || schedule.length === 0) return result;
+
+    if (mode === "students") {
+      const cours_j = selectedCours ? groups[selectedCours] : undefined;
+      if (cours_j !== undefined) {
+        for (let i = index; i < index + 22 && i < schedule.length; i += 3) {
+          if (schedule[i] && schedule[i][cours_j]) {
+            result.push([
+              schedule[i][cours_j] || "",
+              (schedule[i + 1] && schedule[i + 1][cours_j]) || "",
+              (schedule[i + 2] && schedule[i + 2][cours_j]) || "",
+            ]);
+          } else {
+            result.length < 7 && result.push(["", "", ""]);
+          }
+        }
+      }
+    } else {
+      // Teachers mode: scan all rows in the day to find teacher
+      for (let i = index; i < index + 22 && i < schedule.length; i += 3) {
+        const lessonMap = new Map<string, { groups: Set<string>, classroom: string }>();
+
+        // Scan the trio (lesson, teacher, classroom)
+        if (schedule[i] && schedule[i + 1] && schedule[i + 2]) {
+          schedule[i + 1].forEach((cell, colIndex) => {
+            if (cell && typeof cell === "string" && cell.trim() === selectedCours) {
+              // Found teacher in this column, collect lesson, group and classroom
+              const lessonName = (schedule[i][colIndex] && typeof schedule[i][colIndex] === "string") ? schedule[i][colIndex] : "";
+              const groupName = (schedule[3] && schedule[3][colIndex] && typeof schedule[3][colIndex] === "string") ? schedule[3][colIndex] : "";
+              const classroom = (schedule[i + 2][colIndex] && typeof schedule[i + 2][colIndex] === "string") ? schedule[i + 2][colIndex] : "";
+              
+              if (lessonName.trim() || groupName.trim() || classroom.trim()) {
+                if (!lessonMap.has(lessonName)) {
+                  lessonMap.set(lessonName, { groups: new Set(), classroom });
+                }
+                const entry = lessonMap.get(lessonName)!;
+                if (groupName.trim()) {
+                  entry.groups.add(groupName);
+                }
+              }
+            }
+          });
+        }
+
+        let foundLesson: string[] = [];
+        if (lessonMap.size > 0) {
+          lessonMap.forEach(({ groups, classroom }) => {
+            foundLesson.push(
+              Array.from(lessonMap.keys())[0],
+              Array.from(groups).join(", "),
+              classroom
+            );
+          });
+        }
+
+        result.push(foundLesson.length > 0 ? foundLesson : ["", "", ""]);
       }
     }
-  }
+
+    return result;
+  }, [schedule, mode, selectedCours, index, groups]);
 
   return (
-    <ScrollView contentContainerStyle={styles.lessonsContainer} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={styles.lessonsContainer}
+      showsVerticalScrollIndicator={false}
+    >
       {schedule.length === 0 ? (
         <Text style={styles.emptyText}>Завантаження...</Text>
       ) : (
-        lessons.map((lesson, index) => (
-          <View key={index} style={styles.wrapper}>
-            <View>
-              <Text>{lesson_i++}</Text>
-              <Text
-                style={{
-                  color:
-                    lesson[0] === "Кураторська година"
-                      ? COLORS.SECONDARY_COLOR
-                      : lesson[0].includes("Консультація")
-                      ? COLORS.RED
-                      : lesson[0]
-                      ? COLORS.GREEN
-                      : COLORS.BORDER_COLOR,
-                }}
-              >
-                ●
-              </Text>
-            </View>
-            <View style={styles.lessonWraper}>
-              <Text>{lesson[0]}</Text>
-              <Text>{lesson[1]}</Text>
-              <Text>{lesson[2]}</Text>
-            </View>
-            <Text style={styles.lessonTime}>{times[times_i++]}</Text>
-          </View>
+        lessons.map((lesson, idx) => (
+          <LessonItem key={idx} lesson={lesson} index={idx} />
         ))
       )}
     </ScrollView>
@@ -80,26 +108,9 @@ export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
-  wrapper: {
-    backgroundColor: COLORS.PRIMARY_COLOR,
-    borderRadius: 15,
-    padding: width * 0.04,
-    flexDirection: "row",
-    gap: 10,
-    height: width * 0.2,
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   lessonsContainer: {
     gap: width * 0.03,
     padding: width * 0.04,
-  },
-  lessonWraper: {
-    flex: 3,
-  },
-  lessonTime: {
-    flex: 1,
-    textAlign: "right",
   },
   emptyText: {
     color: COLORS.BORDER_COLOR,

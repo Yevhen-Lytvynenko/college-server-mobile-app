@@ -5,5 +5,6 @@ export const COLORS = {
     BORDER_COLOR: "#ccc",
     GREEN: '#00ac2eff',
     RED: '#e20000ff',
+    YELLOW: 'rgb(255, 196, 0)',
     DARK_BLUE: '#0047b2ff'
 }

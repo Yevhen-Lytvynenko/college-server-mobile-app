@@ -5,7 +5,7 @@ import { GroupPicker } from "../components/GroupPicker";
 import { DayScheduleScene } from "../components/DayScheduleScene";
 import { fetchSchedule } from "../parser";
 import { COLORS } from "../constants/ui";
-import { days } from "../constants/data";
+import { days, day_i } from "../constants/data";
 
 const { width } = Dimensions.get("window");
 
@@ -14,6 +14,7 @@ export const ScheduleScreen = () => {
   const [cours, setCours] = useState("K25.1");
   const [items, setItems] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"students" | "teachers">("students");
 
   const initialDayIndex = Math.max(0, new Date().getDay() - 1);
   const [index, setIndex] = useState(initialDayIndex);
@@ -21,23 +22,51 @@ export const ScheduleScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const data = await fetchSchedule(`https://stud.server.odessa.ua/wp-content/uploads/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, "0")}/`);
+      const data = await fetchSchedule(`https://stud.server.odessa.ua/wp-content/uploads/${new Date().getFullYear()}/${String(new Date().getMonth()+1).padStart(2, "0")}/`);
       setSchedule(data);
     })();
   }, []);
 
+  const groups = useMemo(() => {
+    if (schedule.length === 0) return {};
 
-const groups = useMemo(() => {
-  return (
-    schedule[3]?.reduce((acc: Record<string, number>, cell: string, i: number) => {
-      if (cell && cell.trim() !== "") acc[cell.trim()] = i;
-      return acc;
-    }, {}) ?? {}
-  );
-}, [schedule]);
+    if (mode === "students") {
+      return (
+        schedule[3]?.reduce((acc: Record<string, number>, cell: string, i: number) => {
+          if (cell && cell.trim() !== "") acc[cell.trim()] = i;
+          return acc;
+        }, {}) ?? {}
+      );
+    } else {
+      // Teachers mode: extract unique teachers from second row of each day
+      const teachers = new Set<string>();
+      Object.values(day_i).forEach((dayStartIndex) => {
+        for (let i = dayStartIndex + 1; i < dayStartIndex + 22 && i < schedule.length; i += 3) {
+          if (schedule[i] && Array.isArray(schedule[i])) {
+            schedule[i].forEach((cell) => {
+              if (cell && cell.trim() !== "") {
+                teachers.add(cell.trim());
+              }
+            });
+          }
+        }
+      });
+      return Array.from(teachers).reduce((acc: Record<string, number>, teacher: string, i: number) => {
+        acc[teacher] = i;
+        return acc;
+      }, {});
+    }
+  }, [schedule, mode]);
+
   useEffect(() => {
     setItems(Object.keys(groups));
   }, [groups]);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      setCours(items[0]);
+    }
+  }, [items]);
 
   const renderScene = ({ route }: any) => (
     <DayScheduleScene
@@ -45,6 +74,7 @@ const groups = useMemo(() => {
       schedule={schedule}
       groups={groups}
       selectedCours={cours}
+      mode={mode}
     />
   );
 
@@ -58,6 +88,8 @@ const groups = useMemo(() => {
           onSelect={setCours}
           onClose={() => setOpen(false)}
           onToggle={() => setOpen(!open)}
+          mode={mode}
+          onModeChange={setMode}
         />
       </View>
 
