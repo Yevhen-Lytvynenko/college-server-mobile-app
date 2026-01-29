@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "566903903851",
+    "project_id": "college-server-schedule",
+    "storage_bucket": "college-server-schedule.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566903903851:android:35dc7518c70c6d4092832e",
+        "android_client_info": {
+          "package_name": "com.yevhen_lytvynenko.schedule"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCReqx96nbTdUMfIdjnD_XsjZOs70PMhU8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

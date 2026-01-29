@@ -45,15 +45,12 @@ export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
         }
       }
     } else {
-      // Teachers mode: scan all rows in the day to find teacher
       for (let i = index; i < index + 22 && i < schedule.length; i += 3) {
         const lessonMap = new Map<string, { groups: Set<string>, classroom: string }>();
-
-        // Scan the trio (lesson, teacher, classroom)
+        
         if (schedule[i] && schedule[i + 1] && schedule[i + 2]) {
           schedule[i + 1].forEach((cell, colIndex) => {
             if (cell && typeof cell === "string" && cell.trim() === selectedCours) {
-              // Found teacher in this column, collect lesson, group and classroom
               const lessonName = (schedule[i][colIndex] && typeof schedule[i][colIndex] === "string") ? schedule[i][colIndex] : "";
               const groupName = (schedule[3] && schedule[3][colIndex] && typeof schedule[3][colIndex] === "string") ? schedule[3][colIndex] : "";
               const classroom = (schedule[i + 2][colIndex] && typeof schedule[i + 2][colIndex] === "string") ? schedule[i + 2][colIndex] : "";

@@ -3,34 +3,23 @@
     "name": "schedule",
     "slug": "schedule",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.lytvynenko.collegeSchedule",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
-    },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.yevhen_lytvynenko.schedule"
+      "package": "com.yevhen_lytvynenko.schedule",
+      "googleServicesFile": "./google-services.json",
+      "edgeToEdgeEnabled": true
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "owner": "yevhen_lytvynenko",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "useExoplayer": true
+          }
+        }
+      ],
+      "@react-native-firebase/app"
+    ],
     "extra": {
       "eas": {
         "projectId": "1a387e1b-637d-4f5e-9a88-6122bcfb55d6"

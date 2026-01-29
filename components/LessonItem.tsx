@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useMemo} from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { COLORS } from "../constants/ui";
 import { times } from "../constants/data";
+import { getTeacherEmojis } from "../services/firebaseConfig";
 
 interface LessonItemProps {
   lesson: string[];
@@ -10,6 +11,9 @@ interface LessonItemProps {
 
 export const LessonItem: React.FC<LessonItemProps> = ({ lesson, index }) => {
   const number = index + 1;
+  const emojis = useMemo(() => getTeacherEmojis(), []);
+  const teacherName = lesson[1]?.trim(); 
+  const emoji = teacherName ? emojis[teacherName] : null;
   const dotColor = 
     lesson[0] === "Кураторська година"
       ? COLORS.SECONDARY_COLOR
@@ -24,7 +28,11 @@ export const LessonItem: React.FC<LessonItemProps> = ({ lesson, index }) => {
     <View style={styles.wrapper}>
       <View>
         <Text>{number}</Text>
-        <Text style={{ color: dotColor }}>●</Text>
+          {emoji ? (
+      <Text style={{ fontSize: 16 }}>{emoji}</Text>
+    ) : (
+      <Text style={{ color: dotColor }}>●</Text>
+    )}
       </View>
       <View style={styles.lessonWraper}>
         <Text>{lesson[0]}</Text>
@@ -56,5 +64,8 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "right",
   },
+  emojiText: {
+    fontSize: 16,
+  }
 });
  

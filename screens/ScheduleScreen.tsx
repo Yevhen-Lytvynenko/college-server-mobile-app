@@ -38,7 +38,6 @@ export const ScheduleScreen = () => {
         }, {}) ?? {}
       );
     } else {
-      // Teachers mode: extract unique teachers from second row of each day
       const teachers = new Set<string>();
       Object.values(day_i).forEach((dayStartIndex) => {
         for (let i = dayStartIndex + 1; i < dayStartIndex + 22 && i < schedule.length; i += 3) {
