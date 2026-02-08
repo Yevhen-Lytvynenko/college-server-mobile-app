@@ -1,0 +1,17 @@
+# Додатково до .gitignore: не вантажити на EAS (менший архів, менше обривів мережі)
+# https://docs.expo.dev/build-reference/easignore/
+
+android/.gradle/
+android/**/build/
+android/**/.cxx/
+android/app/.cxx/
+
+.expo/
+dist/
+web-build/
+
+# Кеші та зайве
+**/.DS_Store
+**/Thumbs.db
+*.log
+coverage/

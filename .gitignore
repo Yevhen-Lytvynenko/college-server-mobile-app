@@ -12,6 +12,21 @@ expo-env.d.ts
 # Native
 .kotlin/
 *.orig.*
+
+# Android / Gradle (інакше EAS збирає сотні МБ артефактів у tarball)
+android/.gradle/
+android/**/build/
+android/**/.cxx/
+android/local.properties
+*.apk
+*.aab
+*.dex
+
+# iOS
+ios/Pods/
+ios/build/
+ios/**/*.xcworkspace/xcuserdata/
+ios/**/*.xcodeproj/xcuserdata/
 *.jks
 *.p8
 *.p12
