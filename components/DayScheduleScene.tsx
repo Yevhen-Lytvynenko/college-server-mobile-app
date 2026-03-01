@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { ScrollView, Text, StyleSheet, Dimensions } from "react-native";
-import { COLORS } from "../constants/ui";
+import { ScrollView, Text, StyleSheet, Dimensions, RefreshControl } from "react-native";
+import { COLORS, FONTS } from "../constants/ui";
 import { times, day_i } from "../constants/data";
 import { LessonItem } from "../components/LessonItem";
 
@@ -13,6 +13,9 @@ interface DayScheduleSceneProps {
   groups: GroupsMap;
   selectedCours: string;
   mode?: "students" | "teachers";
+  onRefresh?: () => void;
+  refreshing?: boolean;
+  loading?: boolean;
 }
 
 export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
@@ -21,6 +24,9 @@ export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
   groups,
   selectedCours,
   mode = "students",
+  onRefresh,
+  refreshing = false,
+  loading = false,
 }) => {
   const index = day_i[dayKey];
 
@@ -29,15 +35,37 @@ export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
 
     if (index === undefined || schedule.length === 0) return result;
 
+    const isEmptySubject = (val: unknown): boolean => {
+      const s = val != null ? String(val).trim() : "";
+      if (!s) return true;
+      if (/^\d{1,2}$/.test(s)) return true; // номер пари (1–7) — не предмет
+      return false;
+    };
+
+    const getClassroom = (rowIdx: number, col: number): string => {
+      let room = (schedule[rowIdx + 2] && schedule[rowIdx + 2][col]) ?? "";
+      room = String(room).trim();
+      if (room) return room;
+      for (let c = col - 1; c >= 0; c--) {
+        const prev = (schedule[rowIdx + 2] && schedule[rowIdx + 2][c]) ?? "";
+        const prevStr = String(prev).trim();
+        if (prevStr) return prevStr;
+      }
+      return "";
+    };
+
     if (mode === "students") {
       const cours_j = selectedCours ? groups[selectedCours] : undefined;
       if (cours_j !== undefined) {
-        for (let i = index; i < index + 22 && i < schedule.length; i += 3) {
-          if (schedule[i] && schedule[i][cours_j]) {
+        for (let i = index; i < index + 21 && i < schedule.length; i += 3) {
+          const subject = schedule[i] && schedule[i][cours_j];
+          const teacher = (schedule[i + 1] && schedule[i + 1][cours_j]) || "";
+          const classroom = getClassroom(i, cours_j);
+          if (subject && !isEmptySubject(subject)) {
             result.push([
-              schedule[i][cours_j] || "",
-              (schedule[i + 1] && schedule[i + 1][cours_j]) || "",
-              (schedule[i + 2] && schedule[i + 2][cours_j]) || "",
+              String(subject).trim(),
+              String(teacher).trim(),
+              classroom,
             ]);
           } else {
             result.length < 7 && result.push(["", "", ""]);
@@ -45,7 +73,7 @@ export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
         }
       }
     } else {
-      for (let i = index; i < index + 22 && i < schedule.length; i += 3) {
+      for (let i = index; i < index + 21 && i < schedule.length; i += 3) {
         const lessonMap = new Map<string, { groups: Set<string>, classroom: string }>();
         
         if (schedule[i] && schedule[i + 1] && schedule[i + 2]) {
@@ -90,9 +118,16 @@ export const DayScheduleScene: React.FC<DayScheduleSceneProps> = ({
     <ScrollView
       contentContainerStyle={styles.lessonsContainer}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        ) : undefined
+      }
     >
-      {schedule.length === 0 ? (
+      {loading ? (
         <Text style={styles.emptyText}>Завантаження...</Text>
+      ) : schedule.length === 0 ? (
+        <Text style={styles.emptyText}>Немає даних. Потягніть для оновлення.</Text>
       ) : (
         lessons.map((lesson, idx) => (
           <LessonItem key={idx} lesson={lesson} index={idx} />
@@ -114,5 +149,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,
+    fontFamily: FONTS.REGULAR,
   },
 });
