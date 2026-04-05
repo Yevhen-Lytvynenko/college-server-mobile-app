@@ -1,3 +1,11 @@
+export const FONTS = {
+  LIGHT: "e-Ukraine-Light",
+  REGULAR: "e-Ukraine-Regular",
+  MEDIUM: "e-Ukraine-Medium",
+  SEMIBOLD: "e-Ukraine-Medium",
+  BOLD: "e-Ukraine-Bold",
+} as const;
+
 export const COLORS = {
     PRIMARY_COLOR: '#FFFFFF',
     SECONDARY_COLOR: '#0278FE',
