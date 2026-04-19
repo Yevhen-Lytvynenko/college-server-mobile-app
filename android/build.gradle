@@ -36,3 +36,17 @@ allprojects {
 
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
+
+// Узгодження Java 17 для усіх library-модулів (Firebase, pager-view тощо) — зменшує
+// ризик "No matching variant / No variants exist" на чистих CI/EAS збірках з AGP 8.8+.
+// Реєструємось через withId, без пізнього afterEvaluate по subprojects (Gradle 8.13).
+subprojects { subproject ->
+  subproject.plugins.withId("com.android.library") {
+    subproject.android {
+      compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+      }
+    }
+  }
+}

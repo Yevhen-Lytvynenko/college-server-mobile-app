@@ -1,3 +1,5 @@
 <resources>
-  <string name="app_name">schedule</string>
+  <string name="app_name">Коледж Сервер Розклад</string>
+  <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
+  <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
 </resources>
